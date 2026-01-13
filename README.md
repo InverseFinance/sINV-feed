@@ -1,66 +1,68 @@
-## Foundry
+# sINV Price Feed
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A collection of Chainlink-compatible price feed contracts to build sINV price feed.
 
-Foundry consists of:
+## Overview
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+This repository contains three main price feed contracts:
 
-## Documentation
+### ERC4626Feed
 
-https://book.getfoundry.sh/
+A generalized price feed for ERC4626 vaults that converts a normalized asset/USD price to the vault share/USD price using the vault's exchange rate.
+
+- Combines an underlying feed with ERC4626 vault rate
+- Uses `previewRedeem` with fallback to `convertToAssets` for rate calculation
+- Returns prices in 18 decimals
+
+### DynamicFeeCurveFeed
+
+A combined Chainlink and Curve price oracle that accounts for dynamic trading fees.
+
+- Fetches paired token/USD price from a Chainlink feed
+- Uses Curve pool's `price_oracle()` for asset/paired-token rate
+- Applies dynamic fee discount (capped at configurable `maxFee`)
+- Supports governance for fee parameter updates
+
+### NormalizedPriceFeed
+
+A wrapper that normalizes Chainlink feed prices to 18 decimals with optional fallback support.
+
+- Normalizes any Chainlink feed to 18 decimal precision
+- Supports fallback feed for stale price handling
+- Includes price boundary checks via aggregator min/max answers
+
+## Installation
+
+```shell
+forge install
+```
 
 ## Usage
 
 ### Build
 
 ```shell
-$ forge build
+forge build
 ```
 
 ### Test
 
 ```shell
-$ forge test
+forge test
 ```
 
 ### Format
 
 ```shell
-$ forge fmt
+forge fmt
 ```
 
-### Gas Snapshots
+## Dependencies
 
-```shell
-$ forge snapshot
-```
+- [OpenZeppelin Contracts](https://github.com/OpenZeppelin/openzeppelin-contracts) - ERC4626, ERC20 interfaces
+- [Solmate](https://github.com/transmissions11/solmate) - FixedPointMathLib
+- [Forge Std](https://github.com/foundry-rs/forge-std) - Testing utilities
 
-### Anvil
+## License
 
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+MIT
