@@ -1,12 +1,11 @@
-name: CI
-
+# Controls when the workflow will run
 on:
+  # Triggers the workflow on push or pull request events but only for the main and dev branch
   push:
+    branches: [main, dev]
   pull_request:
-  workflow_dispatch:
-
-env:
-  FOUNDRY_PROFILE: ci
+    branches: [main, dev]
+name: test
 
 jobs:
   check:
@@ -20,16 +19,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
 
-      - name: Show Forge version
-        run: |
-          forge --version
-
-      - name: Run Forge build
-        run: |
-          forge build --sizes
-        id: build
-
-      - name: Run Forge tests
-        run: |
-          forge test -vvv
-        id: test
+      - name: Run tests
+        env:
+          RPC_MAINNET: ${{ secrets.RPC_MAINNET }}
+        run: forge test -vvv
